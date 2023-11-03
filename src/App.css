@@ -1,0 +1,61 @@
+.tabContents{
+  flex-wrap: wrap;
+  align-items: flex-start;
+  height: initial !important;
+}
+
+.normalCard{
+  flex-grow: 1;
+  min-width: 350px !important;
+}
+
+.wideCard{
+  flex-grow: 3;
+  min-width: 300px !important;
+}
+
+/* Small devices */
+@media only screen and (max-width: 769px) {
+
+}
+
+/* Large devices */
+@media only screen and (min-width: 769px) {
+  .box_Content{
+    align-items: stretch;
+  }
+  .normalCard{
+    max-width: 350px !important;
+  }
+}
+
+.notificationLayer{
+  width: max-content;
+}
+
+.appHeaderImage {
+  /* The image used */
+  background-image: url("moon.png");
+
+  /* Add the blur effect */
+  filter: blur(8px);
+  -webkit-filter: blur(8px);
+
+  /* Full height */
+  height: 100%;
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+label[for|="checkbox"] {
+  justify-content: space-between;
+  width: auto;
+}
+
+.btouch{
+  touch-action: none;
+
+}
