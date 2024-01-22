@@ -6,8 +6,8 @@ export const RoverTheme = {
   "global": {
     "colors": {
       "brand": {
-        "dark": "#FFB63A",
-        "light": "#FFB63A"
+        "dark": "#881A3A",//"#FFB63A",
+        "light": "#881A3A"//"#FFB63A"
       },
       "background": {
         "light": "#EEEEEE",
