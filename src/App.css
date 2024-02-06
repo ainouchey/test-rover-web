@@ -1,35 +1,34 @@
-.tabContents{
+.tabContents {
   flex-wrap: wrap;
   align-items: flex-start;
   height: initial !important;
 }
 
-.normalCard{
+.normalCard {
   flex-grow: 1;
   min-width: 350px !important;
 }
 
-.wideCard{
+.wideCard {
   flex-grow: 3;
   min-width: 300px !important;
 }
 
 /* Small devices */
 @media only screen and (max-width: 769px) {
-
 }
 
 /* Large devices */
 @media only screen and (min-width: 769px) {
-  .box_Content{
+  .box_Content {
     align-items: stretch;
   }
-  .normalCard{
+  .normalCard {
     max-width: 350px !important;
   }
 }
 
-.notificationLayer{
+.notificationLayer {
   width: max-content;
 }
 
@@ -55,7 +54,6 @@ label[for|="checkbox"] {
   width: auto;
 }
 
-.btouch{
+.btouch {
   touch-action: none;
-
 }
