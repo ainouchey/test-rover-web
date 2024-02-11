@@ -1,8 +1,8 @@
 import React from 'react';
-import { Collapsible, Box, Diagram, Stack, Button, RangeInput, Image, Distribution, Text, Table, TableHeader, TableRow, TableCell, TableBody, ResponsiveContext, Heading, Menu, RadioButtonGroup, TextInput, Form, FormField, Tab, Tabs } from "grommet";
-import { SettingsGroup, StyledCard } from "./CommonUI";
-import { Trigger, Halt, Power, Add, Subtract, CaretUp, CaretDown, CaretNext, CaretPrevious, StatusCritical } from 'grommet-icons'
+import { Collapsible, Box, Diagram, Clock, Stack, Button, RangeInput, Image, Distribution, Text, Table, TableHeader, TableRow, TableCell, TableBody, ResponsiveContext, Heading, Menu, RadioButtonGroup, TextInput, Form, FormField, Tab, Tabs } from "grommet";
+import { Trigger, Subtract, Wifi, Add, StatusCritical, Time } from 'grommet-icons'
 import ls from 'local-storage'
+import { SettingsGroup, StateBox, MovingGraph, StyledCard, StyledNotification } from './CommonUI'
 
 import wasdDark from './wasd-dark.png';
 import arrowDark from './arrow-dark.png';
@@ -20,95 +20,41 @@ class NewStatus extends React.Component {
         this.state = {
             lightMode: false,
             value: '',
-            straightSpeed: '',
-            motionDirection: '',
-            turnSpeed: '',
-            turnRadius: '',
-            turnDirection: '',
-            pointSpeed: '',
-            pointDirection: '',
-            sunkManeuver: ''
-        };
-        this.handleDriveStart = this.handleDriveStart.bind(this);
-        this.handleDriveStop = this.handleDriveStop.bind(this);
-        this.handleSpeedChange = this.handleSpeedChange.bind(this);
-        this.defaultValue = {
-            straightSpeed: '',
-            turnSpeed: '',
-            turnRadius: '',
-            pointSpeed: ''
-        };
-        this.commandedValue = { // May be deleted?
-            straightSpeed: '',
-            turnSpeed: '',
-            turnRadius: '',
-            pointSpeed: ''
-        };
-        /*this.onChange = this.onChange.bind(this);*/
-        this.handleCommandChange = this.handleCommandChange.bind(this);
-    }
-
-    componentDidMount() {
-
-    }
-
-    handleDriveStart() {
-        if (this.props.isConnected === true) {
-            this.props.rover.queueSubject(0xC1);
-        }
-    }
-
-    handleDriveStop() {
-        if (this.props.isConnected === true) {
-            this.props.rover.queueSubject(0xC0);
-        }
-    }
-
-    handleSpeedChange(event, speed, preventDefault = true) {
-        if (preventDefault) event.preventDefault();
-        if (this.props.isConnected === true) {
-            if (speed < 1) {
-                speed = 1;
-            } else if (speed > 10) {
-                speed = 10;
-            }
-            this.props.rover.queueMessage(0xCE, speed);
-        }
-        if (ls.get('vibrate') !== null ? ls.get('vibrate') : true) {
-            window.navigator.vibrate(5);
         };
     }
 
-    handleDPad = (event, keycode, preventDefault = true) => {
-        if (preventDefault) event.preventDefault();
-        if (keycode) {
-            this.props.rover.queueKey(0xCA, keycode);
-            if (parseInt(keycode) % 10 === 1 && (ls.get('vibrate') !== null ? ls.get('vibrate') : true)) {
-                window.navigator.vibrate(5);
-            };
-        }
-    }
 
-    clearControllerError = (event, keycode) => {
-        event.preventDefault();
-        this.props.rover.queueMessage(keycode, 0x00);
-    }
-
-    logs = () => {
-        console.log(this.state.straightSpeed);
-        console.log(this.state.turnSpeed);
-        console.log(this.state.turnRadius);
-    }
-
-
-    handleCommandChange(event) {
-        this.setState({
-            [event.target.name]: event.target.value
-        });
-    }
+    
 
     render() {
         return <Box justify="center" pad={{ "top": "none", "bottom": "small", "left": "small", "right": "small" }} className="tabContents" animation={{ "type": "fadeIn", "size": "small" }} direction="row" align="stretch" fill hoverIndicator={false}>
+              <StyledCard title="System" wide>
+                      <StateBox icon={<Trigger size="medium" />} name="Battery" error={(this.props.roverState.status && this.props.roverState.voltage !== undefined && this.props.roverState.voltage <= 13.2) ? 1 : 0} unit="V" value={this.props.roverState.voltage !== undefined ? (Math.round(this.props.roverState.voltage * 100) / 100).toFixed(1) : "-"} />
+
+                    <StateBox
+                      icon={<Wifi size="medium" />}
+                      name="Signal strength"
+                      value={
+                        this.props.roverState.rssi
+                          ? this.props.roverState.rssi
+                          : "-"
+                      }
+                    />
+                    <StateBox
+                      icon={<Time size="medium" />}
+                      name="On time"
+                      value={!this.props.roverState.ontime && "-"}
+                    >
+                      {this.props.roverState.ontime && (
+                        <Clock
+                          type="digital"
+                          time={this.props.roverState.ontime}
+                        />
+                      )}
+                    </StateBox>
+                  </StyledCard>
+                  <StyledCard wide>
+        <Box justify="center" pad={{ "top": "none", "bottom": "small", "left": "small", "right": "small" }} className="tabContents" animation={{ "type": "fadeIn", "size": "small" }} direction="row" align="stretch" fill hoverIndicator={false}>
             <StyledCard title="Controller State - should not be a box in a box" wide>
                 <ResponsiveContext.Consumer>
                     {size => (
@@ -205,7 +151,27 @@ class NewStatus extends React.Component {
                     )}
                 </ResponsiveContext.Consumer>
             </StyledCard>
-        </Box>;
+        </Box>
+        </StyledCard>
+                    <StyledCard wide title="Acceleration - should be Velocity" foottext={!(this.props.roverIMU.accel) && "Real velocity plot over time"}>
+                      {this.props.roverIMU.accel && (<>
+                        <Box align="center" justify="center">
+                          <MovingGraph data={this.props.roverIMU.accel} unit="m/s2" />
+                        </Box>
+                      </>)}
+                    </StyledCard>
+                    <StyledCard wide title="Angular velocity" foottext={!(this.props.roverIMU.gyro) && "Yaw, pitch, roll"}>
+                      {this.props.roverIMU.gyro && (<>
+                        <Box align="center" justify="center">
+                          <MovingGraph data={this.props.roverIMU.gyro} unit="°/s" />
+                        </Box>
+                      </>)}
+                    </StyledCard>
+                    <StyledCard wide title="OBC Status" foottext={"Temperatures data"}>
+                        <Box align="center" justify="center">
+                        </Box>
+                    </StyledCard>
+                  </Box>;
     }
 }
 

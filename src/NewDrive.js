@@ -251,6 +251,15 @@ class NewDrive extends React.Component {
                         alt="PEEKbot Vision"
                     />
                 </Box>
+                <div style={{display: 'flex', flexDirection: 'row'}}> 
+    <div> 
+    <img fit="cover" src= "funny.jpg" width="100" height="100" alt="PEEKbot Vision"/>
+    </div> 
+    <div> 
+    <img fit="cover" src= "funny.jpg" width="100" height="100" alt="PEEKbot Vision"/>
+    </div> 
+</div> 
+
             </StyledCard>
             <StyledCard title="Driving Maneuvers" wide>
                 <Button margin={{ "top": "small", "bottom": "small", "left": "none", "right": "none" }} label="STOP MOTORS" color="status-critical" onClick={this.handleDriveStop} icon={<Halt />} primary />

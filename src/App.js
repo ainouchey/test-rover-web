@@ -895,7 +895,7 @@ class App extends React.Component {
                 <NewDrive rover={this.state.rover} isConnected={this.state.isConnected} roverState={this.state.roverState} />
               </Tab>
               <Tab title="New Status" icon={<Info />}>
-                {/* Info = light bulb icon */}
+                {/* Info = light bulb icon
               <Box justify="center" pad={{ "top": "none", "bottom": "small", "left": "small", "right": "small" }} className="tabContents" animation={{ "type": "fadeIn", "size": "small" }} direction="row" align="stretch" fill hoverIndicator={false}>
               <StyledCard title="System" wide>
                       <StateBox icon={<Trigger size="medium" />} name="Battery" error={(this.state.roverState.status && this.state.roverState.voltage !== undefined && this.state.roverState.voltage <= 13.2) ? 1 : 0} unit="V" value={this.state.roverState.voltage !== undefined ? (Math.round(this.state.roverState.voltage * 100) / 100).toFixed(1) : "-"} />
@@ -922,9 +922,9 @@ class App extends React.Component {
                       )}
                     </StateBox>
                   </StyledCard>
-                  <StyledCard wide>
-                      <NewStatus rover={this.state.rover} roverController={this.state.roverController} />
-                    </StyledCard>
+                  <StyledCard wide> */}
+                      <NewStatus rover={this.state.rover} roverController={this.state.roverController} roverIMU={this.state.roverIMU} roverState={this.state.roverState} isConnected={this.state.isConnected}/>
+                    {/* </StyledCard>
                     <StyledCard wide title="Acceleration - should be Velocity" foottext={!(this.state.roverIMU.accel) && "Real velocity plot over time"}>
                       {this.state.roverIMU.accel && (<>
                         <Box align="center" justify="center">
@@ -943,7 +943,7 @@ class App extends React.Component {
                         <Box align="center" justify="center">
                         </Box>
                     </StyledCard>
-                  </Box>
+                  </Box> */}
               </Tab>
               <Tab title="Log" plain={false} disabled={false} icon={<DocumentTest />}>
                 <TabLog isConnected={this.state.isConnected} roverState={this.state.roverState} isLogging={this.state.logging} startLogging={this.startLogging} stopLogging={this.stopLogging} />

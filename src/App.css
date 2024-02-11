@@ -14,6 +14,11 @@
   min-width: 300px !important;
 }
 
+.column {
+  flex: 33.33%;
+  padding: 5px;
+}
+
 /* Small devices */
 @media only screen and (max-width: 769px) {
 }
