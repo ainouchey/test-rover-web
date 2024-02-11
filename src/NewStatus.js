@@ -13,36 +13,30 @@ import escLight from './esc-light.png';
 
 const value = '';
 
-class TabDrive extends React.Component {
+class NewStatus extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
             lightMode: false,
-            value: "",
-            straightSpeed: "",
-            motionDirection: "",
-            turnSpeed: "",
-            turnAngle: "",
-            turnRadius: "",
-            turnDirection: "",
-            pointSpeed: "",
-            pointAngle: "",
-            pointDirection: "",
-            sunkManeuver: "",
-      
+            value: '',
+            straightSpeed: '',
+            motionDirection: '',
+            turnSpeed: '',
+            turnRadius: '',
+            turnDirection: '',
+            pointSpeed: '',
+            pointDirection: '',
+            sunkManeuver: ''
         };
         this.handleDriveStart = this.handleDriveStart.bind(this);
         this.handleDriveStop = this.handleDriveStop.bind(this);
         this.handleSpeedChange = this.handleSpeedChange.bind(this);
         this.defaultValue = {
-          straightSpeed: "",
-          turnSpeed: "",
-          turnAngle: "",
-          turnRadius: "",
-          pointSpeed: "",
-          pointAngle: "",
-    
+            straightSpeed: '',
+            turnSpeed: '',
+            turnRadius: '',
+            pointSpeed: ''
         };
         this.commandedValue = { // May be deleted?
             straightSpeed: '',
@@ -106,131 +100,6 @@ class TabDrive extends React.Component {
         console.log(this.state.turnRadius);
     }
 
-    handleManeuver = (event, manCode, preventDefault = true) => {
-        let spLimit = 30; //set the upper limit of the speed in cm/s to avoid hardware damage
-        let angLimit = 90; //set the upper limit of the angle in degrees        
-        let tuLimit = 20; //set the lower limit of the turn radius in cm to avoid hardware damage
-        if (preventDefault) event.preventDefault();
-        switch (manCode) {
-            case 0xE0: //Straight Driving
-                //this.props.rover.queueMessage(0xE0, this.state.straightSpeed);
-                let stSpeed = this.state.straightSpeed;
-                if (stSpeed.length > 4) { alert("Speed input cannot exceed 4 digits. Please reset the inputs.") }
-                else if (Math.abs(stSpeed) > spLimit) { alert("Speed input cannot exceed " + spLimit + " cm/s. Please reset the inputs.") }
-                else {
-                    this.props.rover.queueMessage(0xE0, stSpeed);
-                    console.log("Straight drive maneuver commanded");
-                    console.log(this.state.straightSpeed);
-                    console.log(stSpeed);
-                }
-                break;
-            case 0xE1: //Turn
-                let tuAngle = this.state.turnAngle;
-                let tuRadius = this.state.turnRadius;
-                let tuDirection = this.state.turnDirection;
-                if (tuDirection == "Right turn") { tuDirection = "R" }
-                else if (tuDirection == "Left turn") { tuDirection = "L" }
-                else {console.log("Please select a turn direction")}
-                //setting the boundaries for user input commands to avoid software bugs or hardware limits
-                if (tuAngle.length > 4) {
-                  alert("Angle input cannot exceed 4 digits. Please reset the inputs.");
-                } else if (Math.abs(tuAngle) > angLimit) {
-                  alert(
-                    "Angle input cannot exceed " +
-                      angLimit +
-                      " degrees. Please reset the inputs."
-                  );
-                } else if (tuRadius.length > 4) {
-                  alert(
-                    "Turn radius input cannot exceed 4 digits. Please reset the inputs."
-                  );
-                } else if (tuRadius < tuLimit) {
-                  alert(
-                    "Turn radius input cannot be below " +
-                      tuLimit +
-                      " cm. Please reset the inputs."
-                  );
-                } else {        
-                    let placeHolder = 0;
-                    placeHolder = 4 - tuAngle.length;
-                    for (let i = 1; i <= placeHolder; i++) {
-                        tuAngle = (tuAngle + "x");
-                    }
-                    placeHolder = 4 - tuRadius.length;
-                    for (let i = 1; i <= placeHolder; i++) {
-                        tuRadius = (tuRadius + "x");
-                    }
-                    console.log("Turn drive maneuver commanded");
-                    console.log(this.state.turnAngle);
-                    console.log(tuAngle);
-                    console.log(this.state.turnRadius);
-                    console.log(tuRadius);
-                    console.log(tuDirection);
-                    let cmd = (tuAngle + tuRadius + tuDirection);
-                    console.log(cmd);
-                    this.props.rover.queueMessage(0xE1, cmd);
-                };
-                break;
-            case 0xE2: //Point Turn
-                let ptAngle = this.state.pointAngle;
-                let ptDirection = this.state.pointDirection;
-                if (ptDirection == "Right turn") { ptDirection = "R" }
-                else if (ptDirection == "Left turn") { ptDirection = "L" }
-                else { console.log("Please select a turn direction") }
-                if (ptAngle.length > 4) {
-                  alert("Speed input cannot exceed 4 digits. Please reset the inputs.");
-                } else if (Math.abs(ptAngle) > angLimit) {
-                  alert(
-                    "Angle input cannot exceed " +
-                      angLimit +
-                      " degrees. Please reset the inputs."
-                  );
-                } else {
-                    let placeHolder = 0;
-                    placeHolder = 4 - ptAngle.length;
-                    for (let i = 1; i <= placeHolder; i++) {
-                        ptAngle = (ptAngle + "x");
-                    }
-                    console.log("Point turn maneuver commanded");
-                    console.log(this.state.pointAngle);
-                    console.log(ptAngle);
-                    console.log(ptDirection);
-                    let cmd = (ptAngle + ptDirection);
-                    console.log(cmd);
-                    this.props.rover.queueMessage(0xE2, cmd);
-                };
-                break;
-            case 0xE3: //Sunken Wheel
-                let skManeuver = this.state.sunkManeuver;
-                switch (skManeuver) {
-                    case "Maneuver 1":
-                        skManeuver = "1"
-                        break;
-                    case "Maneuver 2":
-                        skManeuver = "2"
-                        break;
-                    case "Maneuver 3":
-                        skManeuver = "3"
-                        break;
-                    case "Maneuver 4":
-                        skManeuver = "4"
-                        break;
-                    default:
-                        { console.log("Please select a maneuver") }
-                        break;
-                }
-                console.log("Sunken wheel maneuver commanded");
-                console.log(this.state.sunkManeuver);
-                console.log(skManeuver);
-                let cmd = (skManeuver);
-                console.log(cmd)
-                this.props.rover.queueMessage(0xE3, cmd);
-                break;
-            default:
-                console.log("Maneuver command error");
-                break;
-        }
-    }
 
     handleCommandChange(event) {
         this.setState({
@@ -240,7 +109,7 @@ class TabDrive extends React.Component {
 
     render() {
         return <Box justify="center" pad={{ "top": "none", "bottom": "small", "left": "small", "right": "small" }} className="tabContents" animation={{ "type": "fadeIn", "size": "small" }} direction="row" align="stretch" fill hoverIndicator={false}>
-            <StyledCard title="Controller State" centered wide>
+            <StyledCard title="Controller State - should not be a box in a box" wide>
                 <ResponsiveContext.Consumer>
                     {size => (
                         <Box align="center" justify="around" margin={{ "bottom": "small" }} direction="row" wrap={true}>
@@ -334,181 +203,13 @@ class TabDrive extends React.Component {
                             </Box>
                         </Box>
                     )}
-
                 </ResponsiveContext.Consumer>
-            </StyledCard>
-            <StyledCard title="Driving Maneuvers" wide>
-                <Button margin={{ "top": "small", "bottom": "small", "left": "none", "right": "none" }} label="STOP MOTORS" color="status-critical" onClick={this.handleDriveStop} icon={<Halt />} primary />
-                <Box justify="center" >
-                    <Box gap="small" alignContent="center" margin={{ "top": "small", "bottom": "small", "left": "small", "right": "medium" }}>
-                        <Text textAlign="start">Select Driving Maneuver</Text>
-                    </Box>
-                </Box>
-                <Tabs>
-                    <Tab title="Straight Drive">
-                        <Form
-                            value={this.value}
-                            onReset={(event) => {
-                                this.setState({
-                                    straightSpeed: this.defaultValue.straightSpeed
-                                });
-                                console.log('Reset', event.value, event.touched)
-                            }}
-                            onSubmit={(event) => {
-                                console.log('Submit', event.value, event.touched)
-                                this.logs(event.value)
-                                this.handleManeuver(event, 0xE0)
-                                }
-                            }
-                            //onChange={() => this.onChange(this.event.value)}
-                        >
-                            <FormField label="Enter Speed in cm/s" name="straightSpeed" required>
-                                <TextInput
-                                    name="straightSpeed"
-                                    type="text"
-                                    placeholder="Type here!"
-                                    value={this.state.straightSpeed}
-                                    onChange={this.handleCommandChange}
-                                />
-                            </FormField>
-                            <Box direction="row" justify="between" margin={{ top: 'medium' }}>
-                                <Button type="reset" label="Reset" />
-                                <Button type="submit" label="Update" primary />
-                            </Box>
-                        </Form>
-                    </Tab>
-                    <Tab title="Turn">
-                        <Form
-                            value={this.value}
-                            onReset={(event) => {
-                                this.setState({
-                                    turnAngle: this.defaultValue.turnAngle,
-                                    turnRadius: this.defaultValue.turnRadius
-                                });
-                            }}
-                            onSubmit={(event) => {
-                                console.log('Submit', event.value, event.touched)
-                                this.logs(event.value)
-                                this.handleManeuver(event, 0xE1)
-                                }
-                            }
-                        >
-                                            <FormField
-                  label="Enter turn Angle in degrees"
-                  name="turnAngle"
-                  required
-                >
-
-                                <TextInput
-                                    name="turnAngle"
-                                    type="text"
-                                    placeholder="Type here!"
-                                    value={this.state.turnAngle}
-                                    onChange={this.handleCommandChange}
-                                />
-                            </FormField>
-                            <FormField label="Enter Radius of Curvature in cm" name="turnRadius" required>
-                                <TextInput
-                                    name="turnRadius"
-                                    type="text"
-                                    placeholder="Type here!"
-                                    value={this.state.turnRadius}
-                                    onChange={this.handleCommandChange}
-                                />
-                            </FormField>
-                            <FormField name="turnDirection" required>
-                                <RadioButtonGroup
-                                    name="turnDirection"
-                                    options={['Right turn', 'Left turn']}
-                                    value={this.state.turnDirection}
-                                    onChange={this.handleCommandChange}
-                                />
-                            </FormField>
-                            <Box direction="row" justify="between" margin={{ top: 'medium' }}>
-                                <Button type="reset" label="Reset" />
-                                <Button type="submit" label="Update" primary />
-                            </Box>
-                        </Form>
-                    </Tab>
-                    <Tab title="Point Turn">
-                        <Form
-                            value={this.value}
-                            onReset={(event) => {
-                                this.setState({
-                                    pointSpeed: this.defaultValue.pointSpeed,
-                                    pointDirection: this.defaultValue.pointDirection
-                                });
-                            }}
-                            onSubmit={(event) => {
-                                console.log('Submit', event.value, event.touched)
-                                this.logs(event.value)
-                                this.handleManeuver(event, 0xE2)
-                            }
-                            }
-                        >
-                                            <FormField
-                  label="Enter turn Angle in degrees"
-                  name="pointAngle"
-                  required
-                >
-
-                                <TextInput
-                                    name="pointAngle"
-                                    type="text"
-                                    placeholder="Type here!"
-                                    value={this.state.pointAngle}
-                                    onChange={this.handleCommandChange}
-                                />
-                            </FormField>
-                            <FormField name="pointDirection" required>
-                                <RadioButtonGroup
-                                    name="pointDirection"
-                                    options={['Right turn', 'Left turn']}
-                                    value={this.state.pointDirection}
-                                    onChange={this.handleCommandChange}
-                                />
-                            </FormField>
-                            <Box direction="row" justify="between" margin={{ top: 'medium' }}>
-                                <Button type="reset" label="Reset" />
-                                <Button type="submit" label="Update" primary />
-                            </Box>
-                        </Form>
-                    </Tab>
-                    <Tab title="Sunken Wheel">
-                        <Form
-                            value={this.value}
-                            onReset={(event) => {
-                                this.setState({
-                                });
-                            }}
-                            onSubmit={(event) => {
-                                console.log('Submit', event.value, event.touched)
-                                this.logs(event.value)
-                                this.handleManeuver(event, 0xE3)
-                            }
-                            }
-                        >
-                            <FormField name="sunkManeuver" required>
-                                <RadioButtonGroup
-                                    name="sunkManeuver"
-                                    options={['Maneuver 1', 'Maneuver 2', 'Maneuver 3', 'Maneuver 4']}
-                                    value={this.state.sunkManeuver}
-                                    onChange={this.handleCommandChange}
-                                />
-                            </FormField>
-                            <Box direction="row" justify="between" margin={{ top: 'medium' }}>
-                                <Button type="reset" label="Reset" />
-                                <Button type="submit" label="Update" primary />
-                            </Box>
-                        </Form>
-                    </Tab>
-                </Tabs>
             </StyledCard>
         </Box>;
     }
 }
 
-export default TabDrive;
+export default NewStatus;
 
 const ControllerDiagram = (props) => {
     return (

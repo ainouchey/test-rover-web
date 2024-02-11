@@ -1,51 +1,23 @@
-import React from "react";
-import {
-  Grommet,
-  Layer,
-  Box,
-  Header,
-  Heading,
-  Button,
-  Tabs,
-  Tab,
-  ResponsiveContext,
-  Collapsible,
-  Clock,
-} from "grommet";
-import {
-  Connect,
-  StatusGoodSmall,
-  Trigger,
-  Wifi,
-  Info,
-  Gamepad,
-  DocumentTest,
-  Configure,
-  Close,
-  Time,
-} from "grommet-icons";
-import Rover from "./Rover";
-import TabSettings from "./TabSettings";
-import { RoverTheme } from "./theme";
-import {
-  StateBox,
-  MovingGraph,
-  StyledCard,
-  StyledNotification,
-} from "./CommonUI";
-import "./App.css";
-import ls from "local-storage";
-import TabDrive from "./TabDrive";
-import NewTabDrive from "./NewTabDrive";
-import TabLog from "./TabLog";
+import React from 'react'
+import { Grommet, Layer, Box, Header, Heading, Button, Tabs, Tab, ResponsiveContext, Collapsible, Clock } from 'grommet'
+import { Connect, StatusGoodSmall, Trigger, Wifi, Info, Gamepad, DocumentTest, Configure, Close, Time } from 'grommet-icons'
+import Rover from './Rover'
+import TabSettings from './TabSettings'
+import { RoverTheme } from './theme'
+import { StateBox, MovingGraph, StyledCard, StyledNotification } from './CommonUI'
+import './App.css';
+import ls from 'local-storage'
+import TabDrive from './TabDrive'
+import TabLog from './TabLog'
+import NewStatus from './NewStatus'
+import NewDrive from './NewDrive'
 import { LogFileService } from "./storage_service/logfile_service";
-import { Gamepad as GamepadHandler } from "react-gamepad";
+import { Gamepad as GamepadHandler } from 'react-gamepad';
 
 const testingFunction = false;
 
 var hidden, visibilityChange;
-if (typeof document.hidden !== "undefined") {
-  // Opera 12.10 and Firefox 18 and later support
+if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support
   hidden = "hidden";
   visibilityChange = "visibilitychange";
 } else if (typeof document.msHidden !== "undefined") {
@@ -81,7 +53,7 @@ class App extends React.Component {
       roverState: {},
       roverIMU: {},
       roverController: {},
-      logging: false,
+      logging: false
     };
     this.handleConnectClick = this.handleConnectClick.bind(this);
     this.handleDisconnectClick = this.handleDisconnectClick.bind(this);
@@ -92,8 +64,7 @@ class App extends React.Component {
     this.stopLogging = this.stopLogging.bind(this);
     this.gamepadConnectHandler = this.gamepadConnectHandler.bind(this);
     this.gamepadDisconnectHandler = this.gamepadDisconnectHandler.bind(this);
-    this.gamepadButtonChangeHandler =
-      this.gamepadButtonChangeHandler.bind(this);
+    this.gamepadButtonChangeHandler = this.gamepadButtonChangeHandler.bind(this);
     this.gamepadAxisChangeHandler = this.gamepadAxisChangeHandler.bind(this);
   }
 
@@ -357,35 +328,21 @@ class App extends React.Component {
       snapshot.timestamp = new Date();
       snapshot.data = {};
       // go through each logged item and save the corrosponding data
-      if (targets.accel && this._roverIMU && this._roverIMU.accel)
-        snapshot.data.accelerometer =
-          this._roverIMU.accel[this._roverIMU.accel.length - 1];
-      if (targets.gyro && this._roverIMU && this._roverIMU.gyro)
-        snapshot.data.gyroscope =
-          this._roverIMU.gyro[this._roverIMU.gyro.length - 1];
-      if (targets.magnet && this._roverIMU && this._roverIMU.field)
-        snapshot.data.magnetometer =
-          this._roverIMU.field[this._roverIMU.field.length - 1];
+      if (targets.accel && this._roverIMU && this._roverIMU.accel) snapshot.data.accelerometer = this._roverIMU.accel[this._roverIMU.accel.length - 1];
+      if (targets.gyro && this._roverIMU && this._roverIMU.gyro) snapshot.data.gyroscope = this._roverIMU.gyro[this._roverIMU.gyro.length - 1];
+      if (targets.magnet && this._roverIMU && this._roverIMU.field) snapshot.data.magnetometer = this._roverIMU.field[this._roverIMU.field.length - 1];
       if (targets.motor) {
-        if (this._motorControllerFR)
-          snapshot.data.motorControllerFR = this._motorControllerFR;
-        if (this._motorControllerFL)
-          snapshot.data.motorControllerFL = this._motorControllerFL;
-        if (this._motorControllerRR)
-          snapshot.data.motorControllerRR = this._motorControllerRR;
-        if (this._motorControllerRL)
-          snapshot.data.motorControllerRL = this._motorControllerRL;
+        if (this._motorControllerFR) snapshot.data.motorControllerFR = this._motorControllerFR;
+        if (this._motorControllerFL) snapshot.data.motorControllerFL = this._motorControllerFL;
+        if (this._motorControllerRR) snapshot.data.motorControllerRR = this._motorControllerRR;
+        if (this._motorControllerRL) snapshot.data.motorControllerRL = this._motorControllerRL;
       }
-      if (
-        targets.stats &&
-        this.state.roverState &&
-        this.state.roverState.voltage
-      )
-        snapshot.data.voltage = this.state.roverState.voltage;
-      this.LogFileService.addLogRow(snapshot).catch((exception) => {
-        console.log(exception);
-        this.showNotification(exception.message, "status-critical", 3000);
-      });
+      if (targets.stats && this.state.roverState && this.state.roverState.voltage) snapshot.data.voltage = this.state.roverState.voltage;
+      this.LogFileService.addLogRow(snapshot)
+        .catch(exception => {
+          console.log(exception);
+          this.showNotification(exception.message, "status-critical", 3000)
+        });
     }, interval);
   }
 
@@ -524,7 +481,7 @@ class App extends React.Component {
 
     if (message.length > 1) {
       switch (message[0]) {
-        case 0xa1:
+        case 0xA1:
           // Status
           let statusColor;
           let statusMessage;
@@ -549,39 +506,27 @@ class App extends React.Component {
               break;
           }
           this.setState({
-            ...this.state,
-            roverState: {
+            ...this.state, roverState: {
               ...this.state.roverState,
               status: message[1],
               statusColor: statusColor,
-              statusMessage: statusMessage,
-            },
+              statusMessage: statusMessage
+            }
           });
           break;
-        case 0xa2:
+        case 0xA2:
           // Voltage
-          let voltage = new DataView(message.buffer, 0).getFloat32(1, true);
-          this.setState({
-            ...this.state,
-            roverState: { ...this.state.roverState, voltage: voltage },
-          });
+          let voltage = ((new DataView(message.buffer, 0)).getFloat32(1, true));
+          this.setState({ ...this.state, roverState: { ...this.state.roverState, voltage: voltage } });
           break;
-        case 0xa3:
+        case 0xA3:
           // On time
           // Arduino unsigned long is equivilant to Uint32, little endian... I think?
-          this.setState({
-            ...this.state,
-            roverState: {
-              ...this.state.roverState,
-              ontime: new Date(
-                new DataView(message.buffer, 0).getUint32(1, true)
-              ).toISOString(),
-            },
-          });
+          this.setState({ ...this.state, roverState: { ...this.state.roverState, ontime: new Date((new DataView(message.buffer, 0)).getUint32(1, true)).toISOString() } });
           break;
-        case 0xa4:
+        case 0xA4:
           // RSSI
-          let rssi = new DataView(message.buffer, 0).getInt8(1);
+          let rssi = (new DataView(message.buffer, 0)).getInt8(1);
           let rssiString = "";
           if (rssi === 0) {
             rssiString = "Unknown";
@@ -597,71 +542,60 @@ class App extends React.Component {
             rssiString = "Very Poor";
           }
           // Only append RSSI if user set it in settings
-          if (ls.get("rssi") || false) rssiString += " (" + rssi + ")";
-          this.setState({
-            ...this.state,
-            roverState: { ...this.state.roverState, rssi: rssiString },
-          });
+          if (ls.get('rssi') || false) rssiString += " (" + rssi + ")";
+          this.setState({ ...this.state, roverState: { ...this.state.roverState, rssi: rssiString } });
           break;
-        case 0xb1:
+        case 0xB1:
           // Accelerometer
           // Parse value, removing subject byte
           let accelData = this.addMovingData(message, this._roverIMU.accel);
           // Save data back to state
           this._roverIMU = { ...this._roverIMU, accel: accelData };
           break;
-        case 0xb2:
+        case 0xB2:
           // Gyroscope
           // Parse value, removing subject byte
           let gyroData = this.addMovingData(message, this._roverIMU.gyro);
           // Save data back to state
           this._roverIMU = { ...this._roverIMU, gyro: gyroData };
           break;
-        case 0xb3:
+        case 0xB3:
           // Magnetometer
           // Parse value, removing subject byte
           let fieldData = this.addMovingData(message, this._roverIMU.field);
           // Save data back to state
           this._roverIMU = { ...this._roverIMU, field: fieldData };
           break;
-        case 0xce:
+        case 0xCE:
           // Target speed
           // Parse value as integer, removing subject byte
-          this.setState({
-            ...this.state,
-            roverState: {
-              ...this.state.roverState,
-              speed: new DataView(message.buffer, 0).getUint8(1),
-            },
-          });
+          this.setState({ ...this.state, roverState: { ...this.state.roverState, speed: (new DataView(message.buffer, 0)).getUint8(1) } });
           break;
-        case 0xd1:
+        case 0xD1:
           // Front right motor controller status
           let jrkFR = new DataView(message.buffer, 0);
           this._motorControllerFR = this.parseMotorControllerStatus(jrkFR);
           break;
-        case 0xd2:
+        case 0xD2:
           // Front left motor controller status
           let jrkFL = new DataView(message.buffer, 0);
           this._motorControllerFL = this.parseMotorControllerStatus(jrkFL);
           break;
-        case 0xd3:
+        case 0xD3:
           // Rear right motor controller status
           let jrkRR = new DataView(message.buffer, 0);
           this._motorControllerRR = this.parseMotorControllerStatus(jrkRR);
           break;
-        case 0xd4:
+        case 0xD4:
           // Rear left motor controller status
           let jrkRL = new DataView(message.buffer, 0);
           this._motorControllerRL = this.parseMotorControllerStatus(jrkRL);
           break;
         default:
-          console.log(
-            "Unknown Message: " + String.fromCharCode.apply(null, message)
-          );
+          console.log("Unknown Message: " + String.fromCharCode.apply(null, message));
       }
     }
-  };
+  }
 
   intervalUpdateState = () => {
     // Update state of rapidly changing data by deep copying
@@ -672,36 +606,25 @@ class App extends React.Component {
         FR: JSON.parse(JSON.stringify(this._motorControllerFR)),
         FL: JSON.parse(JSON.stringify(this._motorControllerFL)),
         RR: JSON.parse(JSON.stringify(this._motorControllerRR)),
-        RL: JSON.parse(JSON.stringify(this._motorControllerRL)),
-      },
+        RL: JSON.parse(JSON.stringify(this._motorControllerRL))
+      }
     });
-  };
+  }
 
   handleConnectClick(e) {
     e.preventDefault();
     this.setState({ ...this.state, isConnecting: true });
-    this.state.rover
-      .request()
-      .then((_) => this.state.rover.connect())
-      .then((bluetoothRemoteGATTServer) => {
-        /* Do something with rover... */
+    this.state.rover.request()
+      .then(_ => this.state.rover.connect())
+      .then((bluetoothRemoteGATTServer) => { /* Do something with rover... */
         console.log(this.state.rover.getDevice());
-        this.state.rover
-          .getDevice()
-          .addEventListener(
-            "gattserverdisconnected",
-            this.handleRoverDisconnect
-          );
+        this.state.rover.getDevice().addEventListener('gattserverdisconnected', this.handleRoverDisconnect);
         this.state.rover.startTxNotifications(this.handleRoverTX);
-        this.setState({
-          ...this.state,
-          isConnected: true,
-          isConnecting: false,
-        });
+        this.setState({ ...this.state, isConnected: true, isConnecting: false });
         this.updateInterval = setInterval(this.intervalUpdateState, 500);
         this.gamepadInterval = setInterval(this.intervalSendGamepad, 50);
       })
-      .catch((error) => {
+      .catch(error => {
         console.log(error.name);
         // show a notification if the error is not due to the user
         // dismissing the connection prompt
@@ -753,12 +676,12 @@ class App extends React.Component {
       for (let i = 0; i < keys.length; i++) {
         // Only send if key states have changed
         if (keys[i] !== this._keystate[i]) {
-          this.state.rover.queueKey(0xca, keys[i]);
+          this.state.rover.queueKey(0xCA, keys[i]);
         }
       }
       this._keystate = keys;
     }
-  };
+  }
 
   gamepadConnectHandler(gamepadIndex) {
     //console.log(`Gamepad ${gamepadIndex} connected !`)
@@ -767,10 +690,10 @@ class App extends React.Component {
   gamepadDisconnectHandler(gamepadIndex) {
     //console.log(`Gamepad ${gamepadIndex} disconnected !`)
     if (this.state.isConnected && this.state.roverState.status === 2) {
-      this.state.rover.queueKey(0xca, "50");
-      this.state.rover.queueKey(0xca, "70");
-      this.state.rover.queueKey(0xca, "60");
-      this.state.rover.queueKey(0xca, "80");
+      this.state.rover.queueKey(0xCA, "50");
+      this.state.rover.queueKey(0xCA, "70");
+      this.state.rover.queueKey(0xCA, "60");
+      this.state.rover.queueKey(0xCA, "80");
     }
     this._leftStickX = 0;
     this._leftStickY = 0;
@@ -968,44 +891,15 @@ class App extends React.Component {
             width={{ max: "1250px" }}
           >
             <Tabs justify="center" flex>
-              <Tab title="Status" icon={<Info />}>
+              <Tab title="New Drive" icon={<Gamepad />} >
+                <NewDrive rover={this.state.rover} isConnected={this.state.isConnected} roverState={this.state.roverState} />
+              </Tab>
+              <Tab title="New Status" icon={<Info />}>
                 {/* Info = light bulb icon */}
-                <Box
-                  justify="center"
-                  pad={{
-                    top: "none",
-                    bottom: "small",
-                    left: "small",
-                    right: "small",
-                  }}
-                  className="tabContents"
-                  animation={{ type: "fadeIn", size: "small" }} // change of tab animation
-                  direction="row"
-                  align="stretch"
-                  fill
-                  hoverIndicator={false}
-                >
-                  <StyledCard title="System">
-                    <StateBox
-                      icon={<Trigger size="medium" />}
-                      name="Battery"
-                      error={
-                        this.state.roverState.status &&
-                        this.state.roverState.voltage !== undefined &&
-                        this.state.roverState.voltage <= 13.2
-                          ? 1
-                          : 0
-                      }
-                      unit="V"
-                      value={
-                        this.state.roverState.voltage !== undefined
-                          ? (
-                              Math.round(this.state.roverState.voltage * 100) /
-                              100
-                            ).toFixed(1)
-                          : "-"
-                      }
-                    />
+              <Box justify="center" pad={{ "top": "none", "bottom": "small", "left": "small", "right": "small" }} className="tabContents" animation={{ "type": "fadeIn", "size": "small" }} direction="row" align="stretch" fill hoverIndicator={false}>
+              <StyledCard title="System" wide>
+                      <StateBox icon={<Trigger size="medium" />} name="Battery" error={(this.state.roverState.status && this.state.roverState.voltage !== undefined && this.state.roverState.voltage <= 13.2) ? 1 : 0} unit="V" value={this.state.roverState.voltage !== undefined ? (Math.round(this.state.roverState.voltage * 100) / 100).toFixed(1) : "-"} />
+
                     <StateBox
                       icon={<Wifi size="medium" />}
                       name="Signal strength"
@@ -1028,92 +922,34 @@ class App extends React.Component {
                       )}
                     </StateBox>
                   </StyledCard>
-                  <StyledCard // IMU plots
-                    wide
-                    title="Acceleration"
-                    foottext={!this.state.roverIMU.accel && "waiting for data"}
-                  >
-                    {this.state.roverIMU.accel && (
-                      <>
+                  <StyledCard wide>
+                      <NewStatus rover={this.state.rover} roverController={this.state.roverController} />
+                    </StyledCard>
+                    <StyledCard wide title="Acceleration - should be Velocity" foottext={!(this.state.roverIMU.accel) && "Real velocity plot over time"}>
+                      {this.state.roverIMU.accel && (<>
                         <Box align="center" justify="center">
-                          <MovingGraph
-                            data={this.state.roverIMU.accel}
-                            unit="m/s2"
-                          />
+                          <MovingGraph data={this.state.roverIMU.accel} unit="m/s2" />
                         </Box>
-                      </>
-                    )}
-                  </StyledCard>
-                  <StyledCard
-                    wide
-                    title="Angular velocity"
-                    foottext={!this.state.roverIMU.gyro && "waiting for data"}
-                  >
-                    {this.state.roverIMU.gyro && (
-                      <>
+                      </>)}
+                    </StyledCard>
+                    <StyledCard wide title="Angular velocity" foottext={!(this.state.roverIMU.gyro) && "Yaw, pitch, roll"}>
+                      {this.state.roverIMU.gyro && (<>
                         <Box align="center" justify="center">
-                          <MovingGraph
-                            data={this.state.roverIMU.gyro}
-                            unit="°/s"
-                          />
+                          <MovingGraph data={this.state.roverIMU.gyro} unit="°/s" />
                         </Box>
-                      </>
-                    )}
-                  </StyledCard>
-                  <StyledCard
-                    wide
-                    title="Magnetic field"
-                    foottext={!this.state.roverIMU.field && "waiting for data"}
-                  >
-                    {this.state.roverIMU.field && (
-                      <>
+                      </>)}
+                    </StyledCard>
+                    <StyledCard wide title="OBC Status" foottext={"Temperatures data"}>
                         <Box align="center" justify="center">
-                          <MovingGraph
-                            data={this.state.roverIMU.field}
-                            unit="uT"
-                          />
                         </Box>
-                      </>
-                    )}
-                  </StyledCard>
-                </Box>
+                    </StyledCard>
+                  </Box>
               </Tab>
-              <Tab title="New Drive" icon={<Gamepad />}>
-                <NewTabDrive
-                  rover={this.state.rover}
-                  isConnected={this.state.isConnected}
-                  roverState={this.state.roverState}
-                  roverController={this.state.roverController}
-                />
+              <Tab title="Log" plain={false} disabled={false} icon={<DocumentTest />}>
+                <TabLog isConnected={this.state.isConnected} roverState={this.state.roverState} isLogging={this.state.logging} startLogging={this.startLogging} stopLogging={this.stopLogging} />
               </Tab>
-              <Tab title="Drive" icon={<Gamepad />}>
-                <TabDrive
-                  rover={this.state.rover}
-                  isConnected={this.state.isConnected}
-                  roverState={this.state.roverState}
-                  roverController={this.state.roverController}
-                />
-              </Tab>
-              <Tab
-                title="Log"
-                plain={false}
-                disabled={false}
-                icon={<DocumentTest />}
-              >
-                <TabLog
-                  isConnected={this.state.isConnected}
-                  roverState={this.state.roverState}
-                  isLogging={this.state.logging}
-                  startLogging={this.startLogging}
-                  stopLogging={this.stopLogging}
-                />
-              </Tab>
-              <Tab
-                title="Settings"
-                plain={false}
-                disabled={false}
-                icon={<Configure />}
-              >
+              <Tab title="Settings" plain={false} disabled={false} icon={<Configure />}>
+
                 <TabSettings onPreferenceUpdate={this.handlePreferenceUpdate} />
               </Tab>
             </Tabs>
