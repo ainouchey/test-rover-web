@@ -39,7 +39,7 @@ export function SettingsGroup(props) {
 
 export function StyledCard(props) {
     return <>
-        <Card className={props.wide ? "wideCard" : "normalCard"} elevation="0" margin="small" background={{ "color": "background-front" }}>
+        <Card className={props.wide ? "wideCard" : "normalCard"} height = {props.height} elevation="0" margin="small" background={{ "color": "background-front" }}>
             {props.title && <CardHeader background={{ "color": "background-contrast" }} align="center" direction="row" justify="between" gap="medium" pad={{ "top": "small", "bottom": "small", "left": "medium", "right": "medium" }}>
                 <Text weight="bold">
                     {props.title}

@@ -19,24 +19,30 @@ class NewDrive extends React.Component {
         super(props);
         this.state = {
             lightMode: false,
-            value: '',
-            straightSpeed: '',
-            motionDirection: '',
-            turnSpeed: '',
-            turnRadius: '',
-            turnDirection: '',
-            pointSpeed: '',
-            pointDirection: '',
-            sunkManeuver: ''
+            value: "",
+            straightSpeed: "",
+            motionDirection: "",
+            turnSpeed: "",
+            turnAngle: "",
+            turnRadius: "",
+            turnDirection: "",
+            pointSpeed: "",
+            pointAngle: "",
+            pointDirection: "",
+            sunkManeuver: "",
+      
         };
         this.handleDriveStart = this.handleDriveStart.bind(this);
         this.handleDriveStop = this.handleDriveStop.bind(this);
         this.handleSpeedChange = this.handleSpeedChange.bind(this);
         this.defaultValue = {
-            straightSpeed: '',
-            turnSpeed: '',
-            turnRadius: '',
-            pointSpeed: ''
+          straightSpeed: "",
+          turnSpeed: "",
+          turnAngle: "",
+          turnRadius: "",
+          pointSpeed: "",
+          pointAngle: "",
+    
         };
         this.commandedValue = { // May be deleted?
             straightSpeed: '',
@@ -102,8 +108,9 @@ class NewDrive extends React.Component {
 
     handleManeuver = (event, manCode, preventDefault = true) => {
         let spLimit = 30; //set the upper limit of the speed in cm/s to avoid hardware damage
+        let angLimit = 90; //set the upper limit of the angle in degrees        
         let tuLimit = 20; //set the lower limit of the turn radius in cm to avoid hardware damage
-        if (preventDefault) event.preventDefault();
+          if (preventDefault) event.preventDefault();
         switch (manCode) {
             case 0xE0: //Straight Driving
                 //this.props.rover.queueMessage(0xE0, this.state.straightSpeed);
@@ -117,60 +124,79 @@ class NewDrive extends React.Component {
                     console.log(stSpeed);
                 }
                 break;
-            case 0xE1: //Turn
-                let tuSpeed = this.state.turnSpeed;
+                case 0xE1: //Turn
+                let tuAngle = this.state.turnAngle;
                 let tuRadius = this.state.turnRadius;
                 let tuDirection = this.state.turnDirection;
                 if (tuDirection == "Right turn") { tuDirection = "R" }
                 else if (tuDirection == "Left turn") { tuDirection = "L" }
                 else {console.log("Please select a turn direction")}
                 //setting the boundaries for user input commands to avoid software bugs or hardware limits
-                if (tuSpeed.length > 4) { alert("Speed input cannot exceed 4 digits. Please reset the inputs.")}
-                else if (Math.abs(tuSpeed) > spLimit) { alert("Speed input cannot exceed " + spLimit + " cm/s. Please reset the inputs.")}
-                else if (tuRadius.length > 4) { alert("Turn radius input cannot exceed 4 digits. Please reset the inputs.") }
-                else if (tuRadius < tuLimit) { alert("Turn radius input cannot be below " + tuLimit + " cm. Please reset the inputs.") }
-                else {
+                if (tuAngle.length > 4) {
+                  alert("Angle input cannot exceed 4 digits. Please reset the inputs.");
+                } else if (Math.abs(tuAngle) > angLimit) {
+                  alert(
+                    "Angle input cannot exceed " +
+                      angLimit +
+                      " degrees. Please reset the inputs."
+                  );
+                } else if (tuRadius.length > 4) {
+                  alert(
+                    "Turn radius input cannot exceed 4 digits. Please reset the inputs."
+                  );
+                } else if (tuRadius < tuLimit) {
+                  alert(
+                    "Turn radius input cannot be below " +
+                      tuLimit +
+                      " cm. Please reset the inputs."
+                  );
+                } else {        
                     let placeHolder = 0;
-                    placeHolder = 4 - tuSpeed.length;
+                    placeHolder = 4 - tuAngle.length;
                     for (let i = 1; i <= placeHolder; i++) {
-                        tuSpeed = (tuSpeed + "x");
+                        tuAngle = (tuAngle + "x");
                     }
                     placeHolder = 4 - tuRadius.length;
                     for (let i = 1; i <= placeHolder; i++) {
                         tuRadius = (tuRadius + "x");
                     }
                     console.log("Turn drive maneuver commanded");
-                    console.log(this.state.turnSpeed);
-                    console.log(tuSpeed);
+                    console.log(this.state.turnAngle);
+                    console.log(tuAngle);
                     console.log(this.state.turnRadius);
                     console.log(tuRadius);
                     console.log(tuDirection);
-                    let cmd = (tuSpeed + tuRadius + tuDirection);
-                    console.log(cmd)
+                    let cmd = (tuAngle + tuRadius + tuDirection);
+                    console.log(cmd);
                     this.props.rover.queueMessage(0xE1, cmd);
                 };
                 break;
             case 0xE2: //Point Turn
-                let ptSpeed = this.state.pointSpeed;
+                let ptAngle = this.state.pointAngle;
                 let ptDirection = this.state.pointDirection;
                 if (ptDirection == "Right turn") { ptDirection = "R" }
                 else if (ptDirection == "Left turn") { ptDirection = "L" }
                 else { console.log("Please select a turn direction") }
-                //setting the boundaries for user input commands to avoid software bugs or hardware limits
-                if (ptSpeed.length > 4) { alert("Speed input cannot exceed 4 digits. Please reset the inputs.") }
-                else if (Math.abs(ptSpeed) > spLimit) { alert("Speed input cannot exceed " + spLimit + " cm/s. Please reset the inputs.") }
-                else {
+                if (ptAngle.length > 4) {
+                  alert("Speed input cannot exceed 4 digits. Please reset the inputs.");
+                } else if (Math.abs(ptAngle) > angLimit) {
+                  alert(
+                    "Angle input cannot exceed " +
+                      angLimit +
+                      " degrees. Please reset the inputs."
+                  );
+                } else {
                     let placeHolder = 0;
-                    placeHolder = 4 - ptSpeed.length;
+                    placeHolder = 4 - ptAngle.length;
                     for (let i = 1; i <= placeHolder; i++) {
-                        ptSpeed = (ptSpeed + "x");
+                        ptAngle = (ptAngle + "x");
                     }
                     console.log("Point turn maneuver commanded");
-                    console.log(this.state.pointSpeed);
-                    console.log(ptSpeed);
+                    console.log(this.state.pointAngle);
+                    console.log(ptAngle);
                     console.log(ptDirection);
-                    let cmd = (ptSpeed + ptDirection);
-                    console.log(cmd)
+                    let cmd = (ptAngle + ptDirection);
+                    console.log(cmd);
                     this.props.rover.queueMessage(0xE2, cmd);
                 };
                 break;
@@ -214,11 +240,14 @@ class NewDrive extends React.Component {
 
     render() {
         return <Box justify="center" pad={{ "top": "none", "bottom": "small", "left": "small", "right": "small" }} className="tabContents" animation={{ "type": "fadeIn", "size": "small" }} direction="row" align="stretch" fill hoverIndicator={false}>
-            <StyledCard title="PEEKbot Vision" foottext={"Insert .png exports from camera folder"}>
-                <Box align="center" justify="center">
-                    <Image
+            <StyledCard title="PEEKbot Vision" foottext={"Insert .png exports from camera folder"} wide height ="650px">
+                <Box justify="center" align="center">
+                    <img
                         fit="cover"
-                        src="/Users/noor/Documents/GitHub/RoverDriver/roverdriverimages/funny.jpg"
+                        //src= {require("./storage_service/funny.jpg")}
+                        src= "funny.jpg"
+                        width={500}
+                        height={500}
                         alt="PEEKbot Vision"
                     />
                 </Box>
@@ -268,7 +297,7 @@ class NewDrive extends React.Component {
                             value={this.value}
                             onReset={(event) => {
                                 this.setState({
-                                    turnSpeed: this.defaultValue.turnSpeed,
+                                    turnAngle: this.defaultValue.turnAngle,
                                     turnRadius: this.defaultValue.turnRadius
                                 });
                             }}
@@ -279,12 +308,17 @@ class NewDrive extends React.Component {
                                 }
                             }
                         >
-                            <FormField label="Enter Average Speed in cm/s" name="turnSpeed" required>
+                                            <FormField
+                  label="Enter turn Angle in degrees"
+                  name="turnAngle"
+                  required
+                >
+
                                 <TextInput
-                                    name="turnSpeed"
+                                    name="turnAngle"
                                     type="text"
                                     placeholder="Type here!"
-                                    value={this.state.turnSpeed}
+                                    value={this.state.turnAngle}
                                     onChange={this.handleCommandChange}
                                 />
                             </FormField>
@@ -327,12 +361,17 @@ class NewDrive extends React.Component {
                             }
                             }
                         >
-                            <FormField label="Enter Speed in cm/s" name="pointSpeed" required>
+                                            <FormField
+                  label="Enter turn Angle in degrees"
+                  name="pointAngle"
+                  required
+                >
+
                                 <TextInput
-                                    name="pointSpeed"
+                                    name="pointAngle"
                                     type="text"
                                     placeholder="Type here!"
-                                    value={this.state.pointSpeed}
+                                    value={this.state.pointAngle}
                                     onChange={this.handleCommandChange}
                                 />
                             </FormField>
